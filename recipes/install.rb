@@ -182,7 +182,7 @@ bash "update_conda" do
   retry_delay 10
   code <<-EOF
     #set -e
-    #{node['conda']['base_dir']}/bin/conda update conda -y -q
-    #{node['conda']['base_dir']}/bin/conda update anaconda -y -q
+   ## #{node['conda']['base_dir']}/bin/conda update conda -y -q
+   ## #{node['conda']['base_dir']}/bin/conda update anaconda -y -q
   EOF
 end
