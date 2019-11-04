@@ -5,4 +5,4 @@ cookbook 'java'
 
 metadata
 
-cookbook 'ulimit', github: "giabbo79/chef-ulimit", branch: "1.0"
+cookbook 'ulimit', github: "giabbo79/chef-ulimit", branch: "master"
