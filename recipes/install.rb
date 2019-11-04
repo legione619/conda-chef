@@ -2,7 +2,11 @@ if node['kernel']['machine'] != 'x86_64'
    Chef::Log.fatal!("Unrecognized node.kernel.machine=#{node['kernel']['machine']}; Only x86_64", 1)
 end
 
-package "bzip2"
+if node['platform_family'].eql?("rhel") && node['rhel']['epel'].downcase == "true"
+  package "epel-release"
+end
+
+package ["bzip2", "vim", "iftop", "htop", "iotop", "rsync"]
 
 group node['conda']['group']
 user node['conda']['user'] do
@@ -13,6 +17,7 @@ user node['conda']['user'] do
   action :create
   system true
   not_if "getent passwd #{node['conda']['user']}"
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
 directory node['install']['dir'] do
@@ -54,26 +59,26 @@ end
 
 if !node['pypi']['index'].eql?("") || !node['pypi']['index-url'].eql?("")
   # PIP mirror configuration
-  directory "/home/#{node['conda']['user']}/.pip" do 
+  directory "/home/#{node['conda']['user']}/.pip" do
     user node['conda']['user']
     group node['conda']['group']
     action :create
   end
 
-  template "/home/#{node['conda']['user']}/.pip/pip.conf" do 
+  template "/home/#{node['conda']['user']}/.pip/pip.conf" do
     source "pip.conf.erb"
     user node['conda']['user']
     group node['conda']['group']
     mode 0755
   end
 
-  directory "/root/.pip" do 
-    user 'root' 
-    group 'root' 
+  directory "/root/.pip" do
+    user 'root'
+    group 'root'
     action :create
   end
 
-  template "/root/.pip/pip.conf" do 
+  template "/root/.pip/pip.conf" do
     source "pip.conf.erb"
     user "root"
     group "root"
@@ -97,20 +102,24 @@ link node['conda']['base_dir'] do
   to node['conda']['home']
 end
 
-dirs=%w{ envs pkgs lib }
-for d in dirs do
+['envs', 'pkgs'].each do |d|
   bash 'run_conda_installer_#{d}' do
     user "root"
     umask "022"
     code <<-EOF
-   set -e
-   if [ ! -d #{node['conda']['dir']}/#{d} ] ; then    # if a new install, mv out envs/libs to keep when upgrading
-       mv #{node['conda']['home']}/#{d} #{node['conda']['dir']}
-       chown -R #{node['conda']['user']}:#{node['conda']['group']} #{node['conda']['dir']}/#{d}
-   else  # this is an upgrade, keep existing installed libs/envs/etc
-      rm -rf #{node['conda']['home']}/#{d}
-   fi
-  EOF
+      set -e
+      if [ ! -d #{node['conda']['dir']}/#{d} ] ; then    # if a new install, mv out envs/libs to keep when upgrading
+          mv #{node['conda']['home']}/#{d} #{node['conda']['dir']}
+          chown -R #{node['conda']['user']}:#{node['conda']['group']} #{node['conda']['dir']}/#{d}
+      else  # this is an upgrade, keep existing installed libs/envs/etc
+          # Copy what there is in pkgs dir, if it's not a link.
+          if [ "#{d}" == "pkgs" ] && [ ! -L #{node['conda']['home']}/#{d} ];
+          then
+            rsync -a #{node['conda']['home']}/#{d}/* #{node['conda']['dir']}/#{d}
+          fi
+          rm -rf #{node['conda']['home']}/#{d}
+      fi
+    EOF
   end
   link "#{node['conda']['home']}/#{d}" do
     owner node['conda']['user']
@@ -137,8 +146,8 @@ ulimit_domain node['conda']['user'] do
   end
 end
 
-if node[:conda].attribute?(:mirror_list)
-  conda_mirrors = node[:conda][:mirror_list].split(",").map(&:strip)
+if node[:conda][:channels].attribute?(:default_mirrors)
+  conda_mirrors = node[:conda][:channels][:default_mirrors].split(",").map(&:strip)
 else
   conda_mirrors = []
 end
@@ -181,8 +190,8 @@ bash "update_conda" do
   retries 1
   retry_delay 10
   code <<-EOF
-    #set -e
-   ## #{node['conda']['base_dir']}/bin/conda update conda -y -q
-   ## #{node['conda']['base_dir']}/bin/conda update anaconda -y -q
+    #{node['conda']['base_dir']}/bin/conda install --no-deps pycryptosat libcryptominisat
+    #{node['conda']['base_dir']}/bin/conda config --set sat_solver pycryptosat
+    #{node['conda']['base_dir']}/bin/conda update anaconda -y -q
   EOF
 end
