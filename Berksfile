@@ -6,7 +6,7 @@ cookbook 'java'
 metadata
 
 <<<<<<< HEAD
-cookbook 'ulimit', github: "giabbo79/chef-ulimit", branch: "master"
+cookbook 'ulimit', github: "giabbo79/chef-ulimit", branch: "1.2"
 =======
-cookbook 'ulimit', github: "giabbo79/chef-ulimit", branch: "master"
->>>>>>> origin/master
+cookbook 'ulimit', github: "giabbo79/chef-ulimit", branch: "1.2"
+>>>>>>> origin/1.2
