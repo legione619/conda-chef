@@ -4,7 +4,7 @@ default["install"]["ssl"]                         = "false"
 default["install"]["addhost"]                     = "false"
 default["install"]["localhost"]                   = "false"
 
-# Valid values are 'aws', 'gce', 'azure'
+# Valid values are 'aws', 'gcp', 'azure'
 default["install"]["cloud"]                       = ""
 
 default["install"]["aws"]["instance_role"]        = "false"
@@ -22,10 +22,10 @@ default["install"]["sudoers"]["rules"]             = "true"
 default["install"]["current_version"]             = ""
 
 # Update target
-default["install"]["version"] = "1.2.0"
+default["install"]["version"] = "1.3.0"
 
 # List of released versions
-default["install"]["versions"] = "0.1.0,0.2.0,0.3.0,0.4.0,0.4.1,0.4.2,0.5.0,0.6.0,0.6.1,0.7.0,0.8.0,0.8.1,0.9.0,0.9.1,0.10.0,1.0.0,1.1.0"
+default["install"]["versions"] = "0.1.0,0.2.0,0.3.0,0.4.0,0.4.1,0.4.2,0.5.0,0.6.0,0.6.1,0.7.0,0.8.0,0.8.1,0.9.0,0.9.1,0.10.0,1.0.0,1.1.0,1.2.0"
 
 
 # These are global attributes which are inherited by all the cookbooks and therefore availabel
@@ -44,20 +44,22 @@ default['install']['enterprise']['download_url']  = nil
 default['install']['enterprise']['username']      = nil
 default['install']['enterprise']['password']      = nil
 
+default['install']['bind_services_private_ip']    = "false"
+
 ############################ END GLOBAL ATTRIBUTES #######################################
 
-default['conda']['version']                       = "2019.10"
+default['conda']['version']                       = "2020.02"
 # the version of python: either '2' or '3'
 default['conda']['python']                        = "3"
 default['conda']['nvidia-ml-py']['version']       = "7.352.0"
 default['conda']['pydoop']['version']             = "2.0.0"
-default['conda']['beam']['version']               = "2.15.0"
-default['conda']['beam']['python']['version']     = node['conda']['beam']['version'] + ".3"
+default['conda']['beam']['version']               = "2.19.0"
+default['conda']['beam']['python']['version']     = node['conda']['beam']['version'] + ".0"
 # either 'pip' or 'git'
 default["conda"]["hops-util-py"]["install-mode"] = "pip"
 default["conda"]["hops-util-py"]["branch"]        = "master"
 default["conda"]["hops-util-py"]["repo"]          = "logicalclocks"
-default["conda"]["hops-util-py"]["minor"]         = "1"
+default["conda"]["hops-util-py"]["minor"]         = "0"
 # last digit is the bugfix version, assuming a version format of X.X.X.X
 default["conda"]["hops-util-py"]["version"]       = node["install"]["version"] + "." + node["conda"]["hops-util-py"]["minor"]
 
@@ -80,6 +82,7 @@ default['conda']['repodata_ttl']                  = 43200 # Cache repodata infor
 default['conda']['proxy']['http']                 = ""
 default['conda']['proxy']['https']                = ""
 
+default['pypi']['proxy']                          = ""
 default['pypi']['index']                          = ""
 default['pypi']['index-url']                      = ""
 default['pypi']['trusted-host']                   = ""
@@ -94,9 +97,11 @@ default['conda']['additional_libs']               = ""
 default['conda']['libs']                          = "hops, pandas, numpy, matplotlib, maggy, tqdm, Flask, scikit-learn, avro, seaborn, confluent-kafka, hops-petastorm, opencv-python, tfx, tensorflow-model-analysis, pytorch, torchvision"
 default['conda']['provided_lib_names']            =  node['conda']['additional_libs'].empty? ? node['conda']['libs'] : "#{node['conda']['libs']}, #{node['conda']['additional_libs']}"
 # Comma separated list of preinstalled libraries users are not able to uninstall
-default['conda']['preinstalled_lib_names']        = "pydoop, pyspark, tensorboard, jupyterlab, sparkmagic, hdfscontents, pyjks, hops-apache-beam, pyopenssl"
+default['conda']['preinstalled_lib_names']        = "tensorflow, pydoop, pyspark, tensorboard, jupyterlab, sparkmagic, hdfscontents, pyjks, hops-apache-beam, pyopenssl"
 
-default['conda']['jupyter']['version']['py3']            = "1.1.4"
-default['conda']['jupyter']['version']['py2']            = "0.33.12"
+default['conda']['jupyter']['version']['py3']                   = "1.1.4"
+default['conda']["jupyter"]["notebook"]["version"]              = "6.0.3"
+default['conda']["jupyter"]["tornado"]["version"]               = "6.0.3"
+default['conda']["jupyter"]["prompt-toolkit"]["version"]        = "3.0.3"
 ## Hopsworks version of JupyterLab-Git pluging, last digit is Hopsworks version
 default['conda']['jupyter']['jupyterlab-git']['version'] = "0.8.1.2"

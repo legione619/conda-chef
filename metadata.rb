@@ -4,15 +4,15 @@ maintainer_email  'jdowling@kth.se'
 license           'Apache v.2'
 description       'Installs/Configures conda'
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           "1.2.0"
+version           "1.3.0"
 
 supports 'ubuntu', '= 14.04'
 supports 'ubuntu', '= 16.04'
 supports 'centos', '= 7.2'
 
-depends           'magic_shell'
-depends           'ulimit'
-depends           'java'
+depends 'magic_shell', '~> 1.0.0'
+depends 'java', '~> 7.0.0'
+depends 'ulimit'
 
 recipe "conda::install", "Installs  conda"
 recipe "conda::default", "Configures conda"
@@ -63,6 +63,10 @@ attribute "install/enterprise/username",
 
 attribute "install/enterprise/password",
           :description => "Password for protected artifacts",
+          :type => "string"
+
+attribute "install/bind_services_private_ip",
+          :description => "Flag to bind services to their private IP instead of 0.0.0.0 Default is false",
           :type => "string"
 
 attribute "install/ssl",
@@ -134,6 +138,10 @@ attribute "conda/default_libs",
           :description => "Space separated list of libraries to be installed in Conda root environment",
           :type => "string"
 
+attribute "pypi/proxy",
+          :description => "HTTP proxy for fetching libraries from PyPI",
+          :type => "string"
+
 attribute "pypi/index",
           :description => "Mirror endpoint for PIP search",
           :type => "string"
@@ -189,3 +197,20 @@ attribute "conda/nvidia-ml-py/version",
 attribute "conda/jupyter/jupyterlab-git/version",
           :description => "Version of Hopsworks version of jupyterlab-git plugin",
           :type => 'string'
+
+attribute "conda/jupyter/version/py3",
+          :description => "Version of jupyterlab to install",
+          :type => 'string'
+
+attribute "conda/jupyter/notebook/version",
+          :description => "Version of notebook to install",
+          :type => 'string'
+
+attribute "conda/jupyter/tornado/version",
+          :description => "Version of tornado to install",
+          :type => 'string'
+
+attribute "conda/jupyter/prompt-toolkit/version",
+          :description => "Version of prompt-toolkit to install",
+          :type => 'string'
+

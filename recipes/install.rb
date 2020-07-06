@@ -6,6 +6,10 @@ if node['platform_family'].eql?("rhel") && node['rhel']['epel'].downcase == "tru
   package "epel-release"
 end
 
+if node['platform_family'].eql?("rhel")
+  package "bind-utils"
+end
+
 package ["bzip2", "vim", "iftop", "htop", "iotop", "rsync"]
 
 group node['conda']['group']
@@ -60,33 +64,32 @@ template "/home/#{node['conda']['user']}/.condarc" do
   })
 end
 
-if !node['pypi']['index'].eql?("") || !node['pypi']['index-url'].eql?("")
-  # PIP mirror configuration
-  directory "/home/#{node['conda']['user']}/.pip" do
-    user node['conda']['user']
-    group node['conda']['group']
-    action :create
-  end
+# PIP mirror configuration
+directory "/home/#{node['conda']['user']}/.pip" do
+  user node['conda']['user']
+  group node['conda']['group']
+  action :create
+end
 
-  template "/home/#{node['conda']['user']}/.pip/pip.conf" do
-    source "pip.conf.erb"
-    user node['conda']['user']
-    group node['conda']['group']
-    mode 0755
-  end
+template "/home/#{node['conda']['user']}/.pip/pip.conf" do
+  source "pip.conf.erb"
+  user node['conda']['user']
+  group node['conda']['group']
+  mode 0755
+end
 
-  directory "/root/.pip" do
-    user 'root'
-    group 'root'
-    action :create
-  end
+# Root because kagent env is installed as root
+directory "/root/.pip" do
+  user 'root'
+  group 'root'
+  action :create
+end
 
-  template "/root/.pip/pip.conf" do
-    source "pip.conf.erb"
-    user "root"
-    group "root"
-    mode 0755
-  end
+template "/root/.pip/pip.conf" do
+  source "pip.conf.erb"
+  user "root"
+  group "root"
+  mode 0755
 end
 
 bash 'run_conda_installer' do
