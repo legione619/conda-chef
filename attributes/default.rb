@@ -4,6 +4,13 @@ default["install"]["ssl"]                         = "false"
 default["install"]["addhost"]                     = "false"
 default["install"]["localhost"]                   = "false"
 
+# Generate and setup ssh access among machine
+#
+# WARNING: This is big security hole
+#
+default["install"]["dev_ssh_keys"]                = "false"
+
+
 # Valid values are 'aws', 'gcp', 'azure'
 default["install"]["cloud"]                       = ""
 
@@ -26,10 +33,10 @@ default["install"]["sudoers"]["rules"]             = "true"
 default["install"]["current_version"]             = ""
 
 # Update target
-default["install"]["version"] = "1.4.0"
+default["install"]["version"] = "2.0.0"
 
 # List of released versions
-default["install"]["versions"] = "0.1.0,0.2.0,0.3.0,0.4.0,0.4.1,0.4.2,0.5.0,0.6.0,0.6.1,0.7.0,0.8.0,0.8.1,0.9.0,0.9.1,0.10.0,1.0.0,1.1.0,1.2.0,1.3.0"
+default["install"]["versions"] = "0.1.0,0.2.0,0.3.0,0.4.0,0.4.1,0.4.2,0.5.0,0.6.0,0.6.1,0.7.0,0.8.0,0.8.1,0.9.0,0.9.1,0.10.0,1.0.0,1.1.0,1.2.0,1.3.0,1.4.0,1.4.1"
 
 
 # These are global attributes which are inherited by all the cookbooks and therefore availabel
@@ -59,7 +66,7 @@ default['hops']['group_id']                       = "1234"
 default['conda']['version']                       = "4.8.3"
 default['conda']['python']                        = "py37"
 
-default['conda']['beam']['version']               = "2.19.0"
+default['conda']['beam']['version']               = "2.24.0"
 default['conda']['pydoop']['version']             = "2.0.0"
 default['conda']['nvidia-ml-py']['version']       = "7.352.0"
 

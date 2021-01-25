@@ -4,7 +4,7 @@ maintainer_email  'jdowling@kth.se'
 license           'Apache v.2'
 description       'Installs/Configures conda'
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           "1.4.0"
+version           "2.0.0"
 
 supports 'ubuntu', '= 14.04'
 supports 'ubuntu', '= 16.04'
@@ -91,6 +91,10 @@ attribute "install/versions",
 
 attribute "install/localhost",
           :description => "Set to 'true' for a localhost installation. Default is 'false'",
+          :type => 'string'
+
+attribute "install/dev_ssh_keys",
+          :description => "Use only for development. It will generate ssh keys and set authorized_keys. Default: false",
           :type => 'string'
 
 attribute "install/cloud",
