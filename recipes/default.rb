@@ -17,6 +17,7 @@ group hops_group do
   members ["#{node['conda']['user']}"]
   append true
   not_if { node['install']['external_users'].casecmp("true") == 0 }
+  only_if "getent group #{hops_group}"
 end
 
 bash "create_base" do
@@ -30,6 +31,8 @@ bash "create_base" do
   EOF
   not_if "test -d #{node['conda']['base_dir']}/envs/#{node['conda']['user']}", :user => node['conda']['user']
 end
+
+kagent_disabled = node['kagent'].attribute?('enabled') && node['kagent']['enabled'].casecmp?("false")
 
 ## First we delete the current hops-system Anaconda environment, if it exists
 bash "remove_hops-system_env" do
@@ -52,6 +55,14 @@ end
 ## but then we would also need to get somehow the hadoop group.
 ## We cannon include hops-hadoop-chef attribute as there will
 ## be cyclic dependencies, so this is the only solution that works.
+if node['conda']['hops-system']['installation-mode'].casecmp?("full")
+  environment_file = "hops-system-environment.yml"
+elsif node['conda']['hops-system']['installation-mode'].casecmp?("minimal")
+  environment_file = "minimal-hops-system-environment.yml"
+else
+  raise "Illegal conda/hops-system/installation-mode value"
+end
+
 bash "create_hops-system_env" do
   user 'root'
   group 'root'
@@ -60,7 +71,7 @@ bash "create_hops-system_env" do
   code <<-EOF
     set -e
     su #{node['conda']['user']} -c "HADOOP_HOME=#{node['install']['dir']}/hadoop PATH=#{node['install']['dir']}/hadoop/bin:$PATH \
-       #{node['conda']['base_dir']}/bin/conda env create -q --file hops-system-environment.yml"
+       #{node['conda']['base_dir']}/bin/conda env create -q --file #{environment_file}"
 
     export HOPS_UTIL_PY_VERSION=#{node['conda']['hops-util-py']['version']}
     export HOPS_UTIL_PY_BRANCH=#{node['conda']['hops-util-py']['branch']}
@@ -84,7 +95,7 @@ bash "update_pip_hops-system_env" do
   code <<-EOF
     #{node['conda']['base_dir']}/envs/hops-system/bin/pip install --upgrade pip       
   EOF
-  only_if "test -d #{node['conda']['base_dir']}/envs/hops-system", :user => node['conda']['user']  
+  only_if "test -d #{node['conda']['base_dir']}/envs/hops-system", :user => node['conda']['user']
 end
 
 ## kagent_utils directory is not accessible by conda user
