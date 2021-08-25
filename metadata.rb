@@ -4,14 +4,14 @@ maintainer_email  'jdowling@kth.se'
 license           'Apache v.2'
 description       'Installs/Configures conda'
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           "2.2.0"
+version           "2.3.0"
 
 supports 'ubuntu', '= 14.04'
 supports 'ubuntu', '= 16.04'
 supports 'centos', '= 7.2'
 
 depends 'magic_shell', '~> 1.0.0'
-depends 'java', '~> 7.0.0'
+depends 'java'
 depends 'ulimit'
 
 recipe "conda::install", "Installs  conda"
@@ -151,6 +151,10 @@ attribute "pypi/index",
 
 attribute "pypi/index-url",
           :description => "Mirror endpoint for PIP install and PIP actions which use PEP503 compliant API",
+          :type => "string"
+
+attribute "pypi/extra-index-url",
+          :description => "Extra-index-url to add to the pip.conf files",
           :type => "string"
 
 attribute "pypi/trusted-host",
