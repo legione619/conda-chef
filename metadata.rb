@@ -4,7 +4,7 @@ maintainer_email  'jdowling@kth.se'
 license           'Apache v.2'
 description       'Installs/Configures conda'
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           "2.3.0"
+version           "2.4.0"
 
 supports 'ubuntu', '= 14.04'
 supports 'ubuntu', '= 16.04'
@@ -37,12 +37,24 @@ attribute "conda/user",
           :description => "User that runs conda",
           :type => 'string'
 
+attribute "conda/user_id",
+          :description => "conda user id. Default: 1511",
+          :type => 'string'
+
 attribute "conda/group",
           :description => "Group that runs conda",
           :type => 'string'
 
+attribute "conda/group_id",
+          :description => "conda group id. Default: 1507",
+          :type => 'string'
+
 attribute "install/dir",
-          :description => "Default ''. Set to a base directory under which all hops services will be installed.",
+          :description => "Default '/srv/hops'. Set to a base directory under which all hops services will be installed.",
+          :type => "string"
+
+attribute "data/dir",
+          :description => "Default '/srv/hopsworks-data'. Set to a base directory under which all Hopsworks services will store their data and other state.",
           :type => "string"
 
 attribute "install/user",
@@ -168,7 +180,23 @@ attribute "conda/preinstalled_lib_names",
 attribute "hops/group_id",
           :description => "the group_id for hops/group. If you change this value you must ensure that it match the gid in the docker image",
           :type => 'string'
-        
+
+attribute "logger/user",
+          :description => "User tailing the services logs and sending them to logstash",
+          :type => 'string'
+
+attribute "logger/user_id",
+          :description => "User id of the logger/user defined above",
+          :type => 'string'
+
+attribute "logger/group",
+          :description => "Group of the user tailing the services logs and sending them to logstash",
+          :type => 'string'
+
+attribute "logger/group_id",
+          :description => "groiup id of the logger/user defined above",
+          :type => 'string'
+
 attribute "install/managed_docker_registry",
           :description => "A switch to enable preparations for managed docker registry.",
           :type => 'string'

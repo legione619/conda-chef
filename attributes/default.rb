@@ -23,6 +23,8 @@ default['install']['managed_kubernetes']              = "false"
 
 # Set the root installation directory for Hopsworks to /srv/hops
 default["install"]["dir"]                         = "/srv/hops"
+# Directory where Hopsworks stateful services will store their data
+default['data']['dir']                            = "/srv/hopsworks-data"
 default["install"]["kubernetes"]                  = "false"
 
 # Directory where to store the suders scripts. The whole chain needs to be owned by root
@@ -33,13 +35,13 @@ default["install"]["sudoers"]["rules"]             = "true"
 default["install"]["current_version"]             = ""
 
 # Update target
-default["install"]["version"] = "2.3.0"
+default["install"]["version"] = "2.4.0"
 
 # List of released versions
-default["install"]["versions"] = "0.1.0,0.2.0,0.3.0,0.4.0,0.4.1,0.4.2,0.5.0,0.6.0,0.6.1,0.7.0,0.8.0,0.8.1,0.9.0,0.9.1,0.10.0,1.0.0,1.1.0,1.2.0,1.3.0,1.4.0,1.4.1,2.0.0,2.1.0,2.2.0"
+default["install"]["versions"] = "0.1.0,0.2.0,0.3.0,0.4.0,0.4.1,0.4.2,0.5.0,0.6.0,0.6.1,0.7.0,0.8.0,0.8.1,0.9.0,0.9.1,0.10.0,1.0.0,1.1.0,1.2.0,1.3.0,1.4.0,1.4.1,2.0.0,2.1.0,2.2.0,2.3.0"
 
 
-# These are global attributes which are inherited by all the cookbooks and therefore availabel
+# These are global attributes which are inherited by all the cookbooks and therefore available
 # to all of them
 
 default["java"]["install_flavor"]                 = "openjdk"
@@ -61,6 +63,11 @@ default['install']['bind_services_private_ip']    = "false"
 
 default['hops']['group_id']                       = "1234"
 
+default['logger']['user']                         = "logger"
+default['logger']['user_id']                      = "1524"
+default['logger']['group']                        = "logger"
+default['logger']['group_id']                     = "1519"
+
 ############################ END GLOBAL ATTRIBUTES #######################################
 
 default['conda']['version']                       = "4.8.3"
@@ -80,7 +87,9 @@ default["conda"]["hops-util-py"]["version"]       = node["install"]["version"] +
 default['conda']['url']                           = node['download_url'] + "/Miniconda3-#{node['conda']['python']}_#{node['conda']['version']}-Linux-x86_64.sh"
 
 default['conda']['user']                          = node['install']['user'].empty? ? 'anaconda' : node['install']['user']
+default['conda']['user_id']                       = '1511'
 default['conda']['group']                         = node['install']['user'].empty? ? 'anaconda' : node['install']['user']
+default['conda']['group_id']                      = '1507'
 
 default['conda']['dir']                           = node['install']['dir'].empty? ? "/srv/hops/anaconda" : node['install']['dir'] + "/anaconda"
 
