@@ -7,13 +7,20 @@ if node['platform_family'].eql?("rhel") && node['rhel']['epel'].downcase == "tru
 end
 
 if node['platform_family'].eql?("rhel")
-  package "bind-utils"
+  package ["bind-utils", "libtirpc-devel"]
 end
 
 package ["bzip2", "vim", "iftop", "htop", "iotop", "rsync"]
 
-group node['conda']['group']
+group node['conda']['group'] do
+  gid node['conda']['group_id']
+  action :create
+  not_if "getent group #{node['conda']['group']}"
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
+end
+
 user node['conda']['user'] do
+  uid node['conda']['user_id']
   gid node['conda']['group']
   manage_home true
   home "/home/#{node['conda']['user']}"
@@ -30,6 +37,14 @@ directory node['install']['dir'] do
   mode '0755'
   action :create
   not_if { ::File.directory?(node['install']['dir']) }
+end
+
+directory node['data']['dir'] do
+  owner 'root'
+  group 'root'
+  mode '0775'
+  action :create
+  not_if { ::File.directory?(node['data']['dir']) }
 end
 
 directory node['conda']['dir']  do
@@ -53,8 +68,10 @@ remote_file installer_path do
   action :create_if_missing
 end
 
+conda_user_home = conda_helpers.get_user_home(node['conda']['user'])
+
 # Template condarc to set mirrors/channels
-template "/home/#{node['conda']['user']}/.condarc" do
+template "#{conda_user_home}/.condarc" do
   source "condarc.erb"
   user node['conda']['user']
   group node['conda']['group']
@@ -65,13 +82,13 @@ template "/home/#{node['conda']['user']}/.condarc" do
 end
 
 # PIP mirror configuration
-directory "/home/#{node['conda']['user']}/.pip" do
+directory "#{conda_user_home}/.pip" do
   user node['conda']['user']
   group node['conda']['group']
   action :create
 end
 
-template "/home/#{node['conda']['user']}/.pip/pip.conf" do
+template "#{conda_user_home}/.pip/pip.conf" do
   source "pip.conf.erb"
   user node['conda']['user']
   group node['conda']['group']
@@ -79,13 +96,13 @@ template "/home/#{node['conda']['user']}/.pip/pip.conf" do
 end
 
 # Root because kagent env is installed as root
-directory "/root/.pip" do
+directory "#{::Dir.home('root')}/.pip" do
   user 'root'
   group 'root'
   action :create
 end
 
-template "/root/.pip/pip.conf" do
+template "#{::Dir.home('root')}/.pip/pip.conf" do
   source "pip.conf.erb"
   user "root"
   group "root"
@@ -132,7 +149,7 @@ else
   conda_mirrors = []
 end
 
-template "/home/#{node['conda']['user']}/hops-system-environment.yml" do
+template "#{conda_user_home}/hops-system-environment.yml" do
   source "hops-system-environment.yml.erb"
   user node['conda']['user']
   group node['conda']['group']
@@ -142,7 +159,7 @@ template "/home/#{node['conda']['user']}/hops-system-environment.yml" do
             })
 end
 
-template "/home/#{node['conda']['user']}/minimal-hops-system-environment.yml" do
+template "#{conda_user_home}/minimal-hops-system-environment.yml" do
   source "minimal-hops-system-environment.yml.erb"
   user node['conda']['user']
   group node['conda']['group']
@@ -156,17 +173,17 @@ end
 # it is supposed to automatically create them, but it's very unpredictable when it comes to do so
 # so we create them manually here
 
-directory "/home/#{node['conda']['user']}/.conda" do
+directory "#{conda_user_home}/.conda" do
   user node['conda']['user']
   group node['conda']['group']
 end
 
-directory "/home/#{node['conda']['user']}/.conda/pkgs" do
+directory "#{conda_user_home}/.conda/pkgs" do
   user node['conda']['user']
   group node['conda']['group']
 end
 
-file "/home/#{node['conda']['user']}/.conda/environments.txt" do
+file "#{conda_user_home}/.conda/environments.txt" do
   user node['conda']['user']
   group node['conda']['group']
 end
